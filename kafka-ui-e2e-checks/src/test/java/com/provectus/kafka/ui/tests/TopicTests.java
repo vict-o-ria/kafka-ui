@@ -6,6 +6,7 @@ import com.provectus.kafka.ui.pages.topic.TopicDetails;
 import com.provectus.kafka.ui.utilities.qaseIoUtils.annotations.AutomationStatus;
 import com.provectus.kafka.ui.utilities.qaseIoUtils.annotations.Suite;
 import com.provectus.kafka.ui.utilities.qaseIoUtils.enums.Status;
+import io.qameta.allure.Issue;
 import io.qase.api.annotation.CaseId;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.*;
@@ -17,10 +18,10 @@ import static com.provectus.kafka.ui.pages.NaviSideBar.SideMenuOption.TOPICS;
 import static com.provectus.kafka.ui.pages.topic.TopicCreateEditForm.CleanupPolicyValue.COMPACT;
 import static com.provectus.kafka.ui.pages.topic.TopicCreateEditForm.CleanupPolicyValue.DELETE;
 import static com.provectus.kafka.ui.pages.topic.TopicCreateEditForm.MaxSizeOnDisk.GB20;
-import static com.provectus.kafka.ui.pages.topic.TopicCreateEditForm.MaxSizeOnDisk.NOT_SET;
 import static com.provectus.kafka.ui.settings.Source.CLUSTER_NAME;
 import static com.provectus.kafka.ui.utilities.FileUtils.fileToString;
 import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class TopicTests extends BaseTest {
@@ -158,22 +159,80 @@ public class TopicTests extends BaseTest {
                 .openSideMenu(TOPICS);
         topicsList
                 .waitUntilScreenReady()
-                .openTopic(TOPIC_FOR_UPDATE.getName());
+                .openTopic(TOPIC_FOR_MESSAGES.getName());
         topicDetails
                 .waitUntilScreenReady()
                 .openTopicMenu(TopicDetails.TopicMenu.MESSAGES)
                 .clickProduceMessageBtn();
         produceMessagePanel
                 .waitUntilScreenReady()
-                .setContentFiled(TOPIC_FOR_UPDATE.getMessageContent())
-                .setKeyField(TOPIC_FOR_UPDATE.getMessageKey())
+                .setContentFiled(TOPIC_FOR_MESSAGES.getMessageContent())
+                .setKeyField(TOPIC_FOR_MESSAGES.getMessageKey())
                 .submitProduceMessage();
         topicDetails
                 .waitUntilScreenReady();
         SoftAssertions softly = new SoftAssertions();
-        softly.assertThat(topicDetails.isKeyMessageVisible((TOPIC_FOR_UPDATE.getMessageKey()))).withFailMessage("isKeyMessageVisible()").isTrue();
-        softly.assertThat(topicDetails.isContentMessageVisible((TOPIC_FOR_UPDATE.getMessageContent()).trim())).withFailMessage("isContentMessageVisible()").isTrue();
+        softly.assertThat(topicDetails.isKeyMessageVisible((TOPIC_FOR_MESSAGES.getMessageKey()))).withFailMessage("isKeyMessageVisible()").isTrue();
+        softly.assertThat(topicDetails.isContentMessageVisible((TOPIC_FOR_MESSAGES.getMessageContent()).trim())).withFailMessage("isContentMessageVisible()").isTrue();
         softly.assertAll();
+    }
+
+    @Issue("Uncomment last assertion after bug https://github.com/provectus/kafka-ui/issues/2778 fix")
+    @DisplayName("clear message")
+    @Suite(suiteId = SUITE_ID, title = SUITE_TITLE)
+    @AutomationStatus(status = Status.AUTOMATED)
+    @CaseId(19)
+    @Test
+    void clearMessage() {
+        naviSideBar
+                .openSideMenu(TOPICS);
+        topicsList
+                .waitUntilScreenReady()
+                .openTopic(TOPIC_FOR_MESSAGES.getName());
+        topicDetails
+                .waitUntilScreenReady()
+                .openTopicMenu(TopicDetails.TopicMenu.OVERVIEW)
+                .clickProduceMessageBtn();
+        produceMessagePanel
+                .waitUntilScreenReady()
+                .setContentFiled(TOPIC_FOR_MESSAGES.getMessageContent())
+                .setKeyField(TOPIC_FOR_MESSAGES.getMessageKey())
+                .submitProduceMessage();
+        topicDetails
+                .waitUntilScreenReady();
+        String messageAmount = topicDetails.MessageCountAmount();
+        assertThat(messageAmount)
+                .withFailMessage("message amount not equals").isEqualTo(topicDetails.MessageCountAmount());
+        topicDetails
+                .openDotPartitionIdMenu()
+                .clickClearMessagesBtn();
+//        assertThat(Integer.toString(Integer.valueOf(messageAmount)-1))
+//                .withFailMessage("message amount not decrease by one").isEqualTo(topicDetails.MessageCountAmount());
+    }
+
+    @DisplayName("Redirect to consumer from topic profile")
+    @Suite(suiteId = SUITE_ID, title = SUITE_TITLE)
+    @AutomationStatus(status = Status.AUTOMATED)
+    @CaseId(20)
+    @Test
+    void redirectToConsumerFromTopic() {
+        String topicName = "source-activities";
+        String consumerGroupId = "connect-sink_postgres_activities";
+        naviSideBar
+                .openSideMenu(TOPICS);
+        topicsList
+                .waitUntilScreenReady()
+                .openTopic(topicName);
+        topicDetails
+                .waitUntilScreenReady()
+                .openTopicMenu(TopicDetails.TopicMenu.CONSUMERS)
+                .openConsumerGroup(consumerGroupId);
+        consumersDetails
+                .waitUntilScreenReady();
+        assertThat(consumersDetails.isRedirectedConsumerTitleVisible(consumerGroupId))
+                .withFailMessage("isRedirectedConsumerTitleVisible").isTrue();
+        assertThat(consumersDetails.isTopicInConsumersDetailsVisible(topicName))
+                .withFailMessage("isTopicInConsumersDetailsVisible").isTrue();
     }
 
     @AfterAll
