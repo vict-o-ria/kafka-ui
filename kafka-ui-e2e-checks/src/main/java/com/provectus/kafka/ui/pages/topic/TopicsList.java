@@ -42,6 +42,22 @@ public class TopicsList extends BasePage {
         return isVisible(getTableElement(topicName));
     }
 
+//    @Step
+//    public boolean isInternalTopicsVisible(){
+//      return isVisible();
+//    }
+
+    @Step
+    public boolean isInternalRadioBtnSelected(){
+      return isSelected(showInternalRadioBtn);
+    }
+
+    @Step
+    public TopicsList clickInternalRadioButton(){
+      clickByJavaScript(showInternalRadioBtn);
+      return this;
+    }
+
     @Step
     public TopicsList openTopic(String topicName) {
         getTableElement(topicName).shouldBe(Condition.enabled).click();

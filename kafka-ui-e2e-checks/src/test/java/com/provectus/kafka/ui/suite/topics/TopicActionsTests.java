@@ -252,6 +252,20 @@ public class TopicActionsTests extends BaseTest {
     softly.assertAll();
   }
 
+  @DisplayName("Checking 'Show Internal Topics' toggle functionality within 'All Topics' page")
+  @Suite(suiteId = SUITE_ID, title = SUITE_TITLE)
+  @AutomationStatus(status = Status.AUTOMATED)
+  @CaseId(11)
+  @Test
+  void checkShowInternalTopicsButtonFunctionality(){
+    naviSideBar
+        .openSideMenu(TOPICS);
+    topicsList
+        .waitUntilScreenReady();
+//    SoftAssertions softly = new SoftAssertions();
+    assertThat(topicsList.isInternalRadioBtnSelected()).as("isInternalRadioBtnSelected()").isTrue();
+  }
+
   @AfterAll
   public void afterAll() {
     TOPIC_LIST.forEach(topic -> apiHelper.deleteTopic(CLUSTER_NAME, topic.getName()));
