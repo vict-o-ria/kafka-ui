@@ -1,8 +1,12 @@
 package com.provectus.kafka.ui.pages.topic;
 
+import static com.codeborne.selenide.Selenide.$$x;
 import static com.codeborne.selenide.Selenide.$x;
+import static org.apache.commons.lang.math.RandomUtils.nextInt;
 
+import com.codeborne.selenide.CollectionCondition;
 import com.codeborne.selenide.Condition;
+import com.codeborne.selenide.ElementsCollection;
 import com.codeborne.selenide.SelenideElement;
 import com.provectus.kafka.ui.pages.BasePage;
 import com.provectus.kafka.ui.utilities.WaitUtils;
@@ -13,6 +17,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.experimental.ExtensionMethod;
+import scala.Int;
 
 @ExtensionMethod(WaitUtils.class)
 public class TopicsList extends BasePage {
@@ -22,6 +27,8 @@ public class TopicsList extends BasePage {
     protected SelenideElement searchField = $x("//input[@placeholder='Search by Topic Name']");
     protected SelenideElement showInternalRadioBtn = $x("//input[@name='ShowInternalTopics']");
     protected String actionButtonLocator = "//button[text()='%s']";
+    protected ElementsCollection externalTopicGridItems = $$x("//td[@style='width: 1px;']/..//a");
+  protected ElementsCollection internalTopicGridItems = $$x("//span[contains(text(),'IN')]");
 
     @Step
     public TopicsList waitUntilScreenReady() {
@@ -42,10 +49,64 @@ public class TopicsList extends BasePage {
         return isVisible(getTableElement(topicName));
     }
 
-//    @Step
-//    public boolean isInternalTopicsVisible(){
-//      return isVisible();
-//    }
+    public boolean isInternalTopicVisible(){
+      return isVisible(internalTopicGridItems.first());
+    }
+
+//  private List<TopicGridItems> initExternalItems() {
+//    List<TopicGridItems> gridItemList = new ArrayList<>();
+//    externalTopicGridItems.shouldHave(CollectionCondition.sizeGreaterThan(0))
+//        .forEach(item -> gridItemList.add(new TopicGridItems(item)));
+//    return gridItemList;
+//  }
+
+  private List<TopicGridItems> initInternalItems() {
+    List<TopicGridItems> gridItemList = new ArrayList<>();
+    internalTopicGridItems.shouldHave(CollectionCondition.sizeGreaterThan(0))
+        .forEach(item -> gridItemList.add(new TopicGridItems(item)));
+    return gridItemList;
+  }
+
+//  @Step
+//  public TopicGridItems getTopicEx() {
+//    return initExternalItems().stream()
+//        .findFirst().orElse(null);
+//  }
+
+  @Step
+  public TopicGridItems getTopicIn() {
+    return initInternalItems().stream()
+        .findFirst().orElse(null);
+  }
+
+  @Step
+  public TopicGridItems getInternalTopic() {
+    return getTopicIn();
+  }
+
+//  @Step
+//  public TopicGridItems getExternalTopic() {
+//    return getTopicEx();
+//  }
+
+public static class TopicGridItems extends BasePage {
+
+  private final SelenideElement element;
+
+  public TopicGridItems(SelenideElement element) {
+    this.element = element;
+  }
+
+  private SelenideElement getTopicRowElm() {
+    return element.$x("//td[@style='width: 1px;']/..//a");
+  }
+
+  @Step
+  public int getTopicRow() {
+    return Integer.parseInt(getTopicRowElm().getText().trim());
+  }
+
+}
 
     @Step
     public boolean isInternalRadioBtnSelected(){

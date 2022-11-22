@@ -264,6 +264,13 @@ public class TopicActionsTests extends BaseTest {
         .waitUntilScreenReady();
 //    SoftAssertions softly = new SoftAssertions();
     assertThat(topicsList.isInternalRadioBtnSelected()).as("isInternalRadioBtnSelected()").isTrue();
+//    topicsList
+//        .getExternalTopic();
+    topicsList
+        .getInternalTopic();
+    topicsList
+        .clickInternalRadioButton();
+    assertThat(topicsList.isInternalTopicVisible()).isFalse();
   }
 
   @AfterAll
