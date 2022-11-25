@@ -307,15 +307,14 @@ public class TopicsTests extends BaseTest {
         .openSideMenu(TOPICS);
     topicsList
         .waitUntilScreenReady();
-//    SoftAssertions softly = new SoftAssertions();
-    assertThat(topicsList.isInternalRadioBtnSelected()).as("isInternalRadioBtnSelected()").isTrue();
-//    topicsList
-//        .getExternalTopic();
+    SoftAssertions softly = new SoftAssertions();
+    softly.assertThat(topicsList.isShowInternalRadioBtnSelected()).as("isInternalRadioBtnSelected()").isTrue();
+    softly.assertThat(topicsList.getInternalTopics()).as("getInternalTopics()").size().isGreaterThan(0);
+    softly.assertThat(topicsList.getNonInternalTopics()).as("getNonInternalTopics()").size().isGreaterThan(0);
+    softly.assertAll();
     topicsList
-        .getInternalTopic();
-    topicsList
-        .clickInternalRadioButton();
-    assertThat(topicsList.isInternalTopicVisible()).isFalse();
+        .unSelectShowInternalRadioButton();
+    assertThat(topicsList.getInternalTopics()).as("getInternalTopics()").size().isEqualTo(0);
   }
 
   @AfterAll
