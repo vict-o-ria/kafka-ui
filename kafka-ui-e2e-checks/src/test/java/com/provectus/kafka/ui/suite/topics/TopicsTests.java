@@ -120,8 +120,6 @@ public class TopicsTests extends BaseTest {
     Assertions.assertFalse(topicsList.isCopySelectedTopicBtnEnabled(), "isCopySelectedTopicBtnEnabled()");
   }
 
-  @Disabled()
-  @Issue("https://github.com/provectus/kafka-ui/issues/2625")
   @DisplayName("should update a topic")
   @Suite(suiteId = SUITE_ID, title = SUITE_TITLE)
   @AutomationStatus(status = Status.AUTOMATED)
@@ -540,6 +538,44 @@ public class TopicsTests extends BaseTest {
     softly.assertThat(topicDetails.isTopicHeaderVisible(topicToCopy.getName()))
         .as("isTopicHeaderVisible()").isTrue();
     softly.assertAll();
+  }
+
+  @DisplayName("Checking available custom parameters with Topic editing")
+  @Suite(suiteId = SUITE_ID, title = SUITE_TITLE)
+  @AutomationStatus(status = Status.AUTOMATED)
+  @CaseId(268)
+  @Test
+  void checkCustomParametersWithTopicEditing(){
+    Topic topicToCheckCustomParameters = new Topic()
+        .setName("topic-to-check-custom-parameters-" + randomAlphabetic(5))
+        .setNumberOfPartitions(1)
+        .setCustomParameterType(COMPRESSION_TYPE);
+    navigateToTopics();
+    topicsList
+        .clickAddTopicBtn();
+    topicCreateEditForm
+        .waitUntilScreenReady()
+        .setTopicName(topicToCheckCustomParameters.getName())
+        .setNumberOfPartitions(topicToCheckCustomParameters.getNumberOfPartitions())
+        .clickAddCustomParameterTypeButton()
+        .setCustomParameterType(topicToCheckCustomParameters.getCustomParameterType())
+        .clickCreateTopicBtn();
+    topicDetails
+        .waitUntilScreenReady();
+    TOPIC_LIST.add(topicToCheckCustomParameters);
+    topicDetails
+        .openDetailsTab(SETTINGS);
+    topicSettingsTab
+        .waitUntilScreenReady();
+    assertThat(topicSettingsTab.getValueByKey("compression.type"))
+        .as("getValueOfKey(compression.type)")
+        .isEqualTo(topicToCheckCustomParameters.getCustomParameterType().getValue());
+    topicDetails
+        .openDotMenu()
+        .clickEditSettingsMenu();
+    topicCreateEditForm
+        .waitUntilScreenReady()
+        .clickAddCustomParameterTypeButton();
   }
 
   @AfterAll

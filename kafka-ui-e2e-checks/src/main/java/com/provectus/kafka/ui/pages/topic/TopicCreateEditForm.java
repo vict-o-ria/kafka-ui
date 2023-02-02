@@ -96,7 +96,7 @@ public class TopicCreateEditForm extends BasePage {
   @Step
   public TopicCreateEditForm setCustomParameterType(CustomParameterType customParameterType) {
     customParameterDdl.shouldBe(Condition.visible).click();
-    $x(String.format(ddlElementLocator, customParameterType.getOptionValue())).shouldBe(Condition.visible).click();
+    $x(String.format(ddlElementLocator, customParameterType.getCustomParameter())).shouldBe(Condition.visible).click();
     return this;
   }
 
