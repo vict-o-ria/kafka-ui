@@ -15,6 +15,11 @@ import com.provectus.kafka.ui.pages.topic.enums.CustomParameterType;
 import com.provectus.kafka.ui.pages.topic.enums.MaxSizeOnDisk;
 import com.provectus.kafka.ui.pages.topic.enums.TimeToRetain;
 import io.qameta.allure.Step;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class TopicCreateEditForm extends BasePage {
 
@@ -30,6 +35,7 @@ public class TopicCreateEditForm extends BasePage {
   protected SelenideElement addCustomParameterTypeBtn = $x("//button[contains(text(),'Add Custom Parameter')]");
   protected SelenideElement customParameterValueField = $x("//input[@placeholder='Value']");
   protected SelenideElement validationCustomParameterValueMsg = $x("//p[contains(text(),'Value is required')]");
+  protected SelenideElement customParameter = $x("//li[@value]");
   protected String ddlElementLocator = "//li[@value='%s']";
   protected String btnTimeToRetainLocator = "//button[@class][text()='%s']";
 
@@ -91,6 +97,21 @@ public class TopicCreateEditForm extends BasePage {
   public TopicCreateEditForm clickAddCustomParameterTypeButton() {
     addCustomParameterTypeBtn.click();
     return this;
+  }
+
+  @Step
+  public TopicCreateEditForm clickCustomParameterDdl() {
+    customParameterDdl.shouldBe(Condition.enabled).click();
+    return this;
+  }
+
+  private List<SelenideElement> getEnabledCustomParameters() {
+    return Stream.of(customParameter).collect(Collectors.toList());
+  }
+
+  @Step
+  public List<SelenideElement> getAllEnabledElements() {
+    return getEnabledCustomParameters();
   }
 
   @Step

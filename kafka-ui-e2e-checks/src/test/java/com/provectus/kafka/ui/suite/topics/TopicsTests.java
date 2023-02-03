@@ -560,6 +560,11 @@ public class TopicsTests extends BaseTest {
         .setTopicName(topicToCheckCustomParameters.getName())
         .setNumberOfPartitions(topicToCheckCustomParameters.getNumberOfPartitions())
         .clickAddCustomParameterTypeButton()
+        .clickCustomParameterDdl();
+    System.out.println(topicCreateEditForm.getAllEnabledElements().size());
+    verifyElementsCondition(topicCreateEditForm.getAllEnabledElements(), Condition.enabled);
+    topicCreateEditForm
+        .clickCustomParameterDdl()
         .setCustomParameterType(topicToCheckCustomParameters.getCustomParameterType())
         .clickCreateTopicBtn();
     topicDetails
@@ -577,7 +582,10 @@ public class TopicsTests extends BaseTest {
         .clickEditSettingsMenu();
     topicCreateEditForm
         .waitUntilScreenReady()
-        .clickAddCustomParameterTypeButton();
+        .clickAddCustomParameterTypeButton()
+        .clickCustomParameterDdl();
+    System.out.println(topicCreateEditForm.getAllEnabledElements().size());
+    verifyElementsCondition(topicCreateEditForm.getAllEnabledElements(), Condition.enabled);
   }
 
   @AfterAll
